@@ -32,6 +32,7 @@ Z_DELETE
 *.app
 *.sdf
 *.opensdf
+*.opendb
 
 # Interpreter
 *.stackdump
