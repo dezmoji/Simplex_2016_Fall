@@ -2,7 +2,7 @@
 void Application::InitVariables(void)
 {
 	////Change this to your name and email
-	//m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	//m_sProgrammer = "Dezmon Gilbert - dog6487@rit.edu";
 
 	////Alberto needed this at this position for software recording.
 	//m_pWindow->setPosition(sf::Vector2i(710, 0));
@@ -54,20 +54,27 @@ void Application::Display(void)
 	static uint uClock = m_pSystem->GenClock(); //generate a new clock for that timer
 	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
 
-	//calculate the current position
-	vector3 v3CurrentPos;
-	
-
-
-
-
 	//your code goes here
-	v3CurrentPos = vector3(0.0f, 0.0f, 0.0f);
-	//-------------------
-	
+	static uint currentPath = 0;	// current path to be followed	
+	vector3 v3StartPoint = m_stopsList[currentPath];	// the start point is the beginning of the current path
+	vector3 v3EndPoint = m_stopsList[(currentPath + 1) % m_stopsList.size()]; // end point is the beginning of the next path (starts at 0 once all paths are finished)
 
+	// get the percentage of current path completion
+	float fTimeBetweenStops = 2.0f; // in seconds
+	// map the value to be between 0.0 and 1.0
+	float fPercentage = MapValue(fTimer, 0.0f, fTimeBetweenStops, 0.0f, 1.0f);
 
-	
+	// calculate the current position
+	vector3 v3CurrentPos = glm::lerp(v3StartPoint,v3EndPoint,fPercentage);
+
+	// check if the current path is done with
+	if (fPercentage >= 1.0f)
+	{
+		currentPath++; // increment to the next path
+		fTimer = m_pSystem->GetDeltaTime(uClock); // restart the clock
+		currentPath %= m_stopsList.size(); // prevent going out of bounds
+	}
+
 	matrix4 m4Model = glm::translate(v3CurrentPos);
 	m_pModel->SetModelMatrix(m4Model);
 
