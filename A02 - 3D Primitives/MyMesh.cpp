@@ -276,7 +276,22 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+
+	// create points that stay the same
+	vector3 pointBaseCenter(0, -a_fHeight / 2, 0);	// center point for the base of the cone
+	vector3 pointTip(0, a_fHeight / 2, 0);			// point for the the tip of the cone
+	float slice = (float)PI * 2.0f / a_nSubdivisions;			// determines the size of a "slice" or subdivision
+
+	// loop to add tris
+	for (int i = 0; i < a_nSubdivisions; i++) {
+		// create points that vary each iteration
+		vector3 point0(a_fRadius * cos(slice * i), -a_fHeight / 2, a_fRadius * sin(slice * i));
+		vector3 point1(a_fRadius * cos(slice + slice * i), -a_fHeight / 2, a_fRadius * sin(slice + slice * i));
+
+		// add tris
+		AddTri(pointBaseCenter, point0, point1);	// add a tri for the base
+		AddTri(pointTip, point1, point0);			// add a tri for the side
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -300,7 +315,24 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	float slice = (float)PI * 2.0f / a_nSubdivisions;				// determines the size of a "slice" or subdivision
+	vector3 pointTopCenter(0, a_fHeight / 2, 0);		// center point for the top base
+	vector3 pointBottomCenter(0, -a_fHeight / 2, 0);	// center point for the bottom base
+	for (int i = 0; i < a_nSubdivisions; i++) {
+		
+		// create points for the top edge of the base
+		vector3 point0(a_fRadius * cos(slice * i), a_fHeight/2, a_fRadius * sin(slice * i));					
+		vector3 point1(a_fRadius * cos(slice + slice * i), a_fHeight/2, a_fRadius * sin(slice + slice * i));
+
+		// create points for the bottom edge of the base
+		vector3 point2(a_fRadius * cos(slice * i), -a_fHeight / 2, a_fRadius * sin(slice * i));
+		vector3 point3(a_fRadius * cos(slice + slice * i), -a_fHeight / 2, a_fRadius * sin(slice + slice * i));
+		
+		// add the tris and quad for the cylinder 
+		AddTri(pointTopCenter, point1, point0);
+		AddQuad(point3, point2, point1, point0);
+		AddTri(pointBottomCenter, point2, point3);
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -330,7 +362,27 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
+	float slice = (float)PI * 2.0f / a_nSubdivisions;		// determines the size of a "slice" or subdivision
+	for (int i = 0; i < a_nSubdivisions; i++) {
+
+		// create points for the top ring of tube
+		vector3 point0(a_fInnerRadius * cos(slice * i), a_fHeight / 2, a_fInnerRadius * sin(slice * i));
+		vector3 point1(a_fInnerRadius * cos(slice + slice * i), a_fHeight / 2, a_fInnerRadius * sin(slice + slice * i));
+		vector3 point2(a_fOuterRadius * cos(slice * i), a_fHeight / 2, a_fOuterRadius * sin(slice * i));
+		vector3 point3(a_fOuterRadius * cos(slice + slice * i), a_fHeight / 2, a_fOuterRadius * sin(slice + slice * i));
+
+		// create points for the bottom ring of tube
+		vector3 point4(a_fInnerRadius * cos(slice * i), -a_fHeight / 2, a_fInnerRadius * sin(slice * i));
+		vector3 point5(a_fInnerRadius * cos(slice + slice * i), -a_fHeight / 2, a_fInnerRadius * sin(slice + slice * i));
+		vector3 point6(a_fOuterRadius * cos(slice * i), -a_fHeight / 2, a_fOuterRadius * sin(slice * i));
+		vector3 point7(a_fOuterRadius * cos(slice + slice * i), -a_fHeight / 2, a_fOuterRadius * sin(slice + slice * i));
+
+		// add quads
+		AddQuad(point3, point2, point1, point0);	// top ring
+		AddQuad(point7, point6, point3, point2);	// outer panels  
+		AddQuad(point5, point4, point7, point6);	// bottom ring 
+		AddQuad(point1, point0, point5, point4);	// inner panels
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -380,14 +432,32 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		GenerateCube(a_fRadius * 2.0f, a_v3Color);
 		return;
 	}
-	if (a_nSubdivisions > 6)
-		a_nSubdivisions = 6;
+	if (a_nSubdivisions > 20)
+		a_nSubdivisions = 20;
 
 	Release();
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+
+	// angles needed to calculate positions of vertices
+	float theta = (float)(2 * PI) / a_nSubdivisions;	// theta will be controlled by i
+	float phi = (float)PI / a_nSubdivisions;			// phi will be controlled by j
+
+	// loop to create the sphere
+	for (int i = 0; i < a_nSubdivisions; i++) {
+		for (int j = 0; j < a_nSubdivisions; j++) {
+
+			// create points to form a quad of the sphere
+			vector3 point0 = a_fRadius * vector3(cos(theta * i) * sin(phi * j), sin(theta * i) * sin(phi * j), cos(phi * j));
+			vector3 point1 = a_fRadius * vector3(cos(theta * i) * sin(phi * (j + 1)), sin(theta * i) * sin(phi * (j + 1)), cos(phi * (j + 1)));
+			vector3 point2 = a_fRadius * vector3(cos(theta * (i + 1)) * sin(phi * j), sin(theta * (i + 1)) * sin(phi * j), cos(phi * j));
+			vector3 point3 = a_fRadius * vector3(cos(theta * (i + 1)) * sin(phi * (j + 1)), sin(theta * (i + 1)) * sin(phi * (j + 1)), cos(phi * (j + 1)));
+
+			// add that quad together
+			AddQuad(point0, point1, point2, point3);
+		}
+	}
 	// -------------------------------
 
 	// Adding information about color
