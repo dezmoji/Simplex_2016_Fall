@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.13
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicX", "BasicX\BasicX.vcxproj", "{E745E25C-0143-42AC-A486-1395A4C972AE}"
 EndProject
@@ -119,6 +119,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "A06 - Octree", "A06 - Octree\A06 - Octree.vcxproj", "{44D2C07B-798D-461B-9019-DFB240593888}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "24_Physics", "24_Physics\24_Physics.vcxproj", "{58CB6636-1057-466F-AB91-BADB3395421A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "E03_Repository", "E03_Repository\E03_Repository.vcxproj", "{FBE16F11-811E-4150-96BB-49183ABF383A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "E04 - Transformations", "E04 - Transformations\E04 - Transformations.vcxproj", "{EBB9679E-A7FB-4096-ACF0-C75272398FBD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -272,6 +276,14 @@ Global
 		{58CB6636-1057-466F-AB91-BADB3395421A}.Debug|x86.Build.0 = Debug|Win32
 		{58CB6636-1057-466F-AB91-BADB3395421A}.Release|x86.ActiveCfg = Release|Win32
 		{58CB6636-1057-466F-AB91-BADB3395421A}.Release|x86.Build.0 = Release|Win32
+		{FBE16F11-811E-4150-96BB-49183ABF383A}.Debug|x86.ActiveCfg = Debug|Win32
+		{FBE16F11-811E-4150-96BB-49183ABF383A}.Debug|x86.Build.0 = Debug|Win32
+		{FBE16F11-811E-4150-96BB-49183ABF383A}.Release|x86.ActiveCfg = Release|Win32
+		{FBE16F11-811E-4150-96BB-49183ABF383A}.Release|x86.Build.0 = Release|Win32
+		{EBB9679E-A7FB-4096-ACF0-C75272398FBD}.Debug|x86.ActiveCfg = Debug|Win32
+		{EBB9679E-A7FB-4096-ACF0-C75272398FBD}.Debug|x86.Build.0 = Debug|Win32
+		{EBB9679E-A7FB-4096-ACF0-C75272398FBD}.Release|x86.ActiveCfg = Release|Win32
+		{EBB9679E-A7FB-4096-ACF0-C75272398FBD}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -317,5 +329,10 @@ Global
 		{AA74BEEF-2484-4B8A-A9F4-ACB122220189} = {E0A09DA7-AF20-49C2-84DC-481ADDD01DCA}
 		{44D2C07B-798D-461B-9019-DFB240593888} = {5D1FB011-A2D8-4107-890B-BF1ACD0C0994}
 		{58CB6636-1057-466F-AB91-BADB3395421A} = {E0A09DA7-AF20-49C2-84DC-481ADDD01DCA}
+		{FBE16F11-811E-4150-96BB-49183ABF383A} = {13CD5CAF-2378-4851-9BEB-DF01D5A85C42}
+		{EBB9679E-A7FB-4096-ACF0-C75272398FBD} = {13CD5CAF-2378-4851-9BEB-DF01D5A85C42}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2BAB4B91-0AA1-4E5C-B538-07888B287130}
 	EndGlobalSection
 EndGlobal

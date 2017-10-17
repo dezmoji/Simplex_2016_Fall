@@ -20,6 +20,8 @@ class Application
 {
 	uint m_uOrbits = 0; //number of shapes starting at 3 and increasing in sides
 	std::vector<uint> m_shapeList; //shape index for circles
+	std::vector<std::vector<vector3>> m_orbitList;	// stores the stop locations for each orbit
+	std::vector<int> m_stopNumList;	// stop index for the current stop number for each orbit
 	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
 	
 private:
