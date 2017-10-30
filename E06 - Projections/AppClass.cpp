@@ -3,7 +3,7 @@ using namespace Simplex;
 void Application::InitVariables(void)
 {
 	////Change this to your name and email
-	//m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	//m_sProgrammer = "Dezmon Gilbert - dog6487@rit.edu";
 
 	////Alberto needed this at this position for software recording.
 	//m_pWindow->setPosition(sf::Vector2i(710, 0));
@@ -11,7 +11,7 @@ void Application::InitVariables(void)
 	//Set the position and target of the camera
 	//(I'm at [0,0,10], looking at [0,0,0] and up is the positive Y axis)
 	m_pCameraMngr->SetPositionTargetAndUp(AXIS_Z * 10.0f, ZERO_V3, AXIS_Y);
-	
+
 	//allocate the primitive
 	m_pMesh1 = new MyMesh();
 	m_pMesh1->GenerateTorus(3.0f, 2.0f, 6, 6, C_RED);
@@ -44,7 +44,7 @@ void Application::Display(void)
 {
 	//Clear the screen
 	ClearScreen();
-	
+
 	//draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
 
@@ -57,21 +57,38 @@ void Application::Display(void)
 		break;
 	case 2:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetPerspective(false);
 		break;
 	case 3:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetPositionTargetAndUp(vector3(30.0f, 0, 0), vector3(0, 0, 0), vector3(0,0,-1.0f));
 		break;
 	case 4:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetPosition(vector3(0, 0, -15.0f));
 		break;
 	case 5:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetNearFar(vector2(5.0f, 15.0f));
+		m_pCamera->SetPosition(vector3(0, 0, -15.0f));
 		break;
 	case 6:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetNearFar(vector2(.1f, 10.0f));
+		m_pCamera->SetPosition(vector3(0, 0, -15.0f));
 		break;
 	case 7:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetUp(vector3(0, -1.0f, 0));
+		break;
+	case 8:
+		m_pCamera->ResetCamera();
+		m_pCamera->SetPerspective(false);
+		m_pCamera->SetUp(vector3(-1.0f, 0, 0));
+		break;
+	case 9:
+		m_pCamera->ResetCamera();
+		m_pCamera->SetPositionTargetAndUp(vector3(-15.0f, 0, -15.0f), vector3(1.5f,0,-5.0f), vector3(0, -1.0f, 0));
 		break;
 	}
 
@@ -80,7 +97,7 @@ void Application::Display(void)
 
 	//draw the primitive
 	m_pMesh1->Render(m_pCamera, glm::rotate(IDENTITY_M4, 90.0f, AXIS_X));
-	m_pMesh2->Render(m_pCamera, glm::translate(IDENTITY_M4, vector3(0.0f,0.0f,-5.0f)) * glm::rotate(IDENTITY_M4, 90.0f, AXIS_X));
+	m_pMesh2->Render(m_pCamera, glm::translate(IDENTITY_M4, vector3(0.0f, 0.0f, -5.0f)) * glm::rotate(IDENTITY_M4, 90.0f, AXIS_X));
 	m_pMesh3->Render(m_pCamera, glm::translate(vector3(0.0f, 0.0f, -10.0f)));
 
 	//render list call
@@ -88,10 +105,10 @@ void Application::Display(void)
 
 	//clear the render list
 	m_pMeshMngr->ClearRenderList();
-	
+
 	//draw gui
 	DrawGUI();
-	
+
 	//end the current frame (internally swaps the front and back buffers)
 	m_pWindow->display();
 }
@@ -101,10 +118,10 @@ void Application::Release(void)
 	SafeDelete(m_pMesh1);
 	SafeDelete(m_pMesh2);
 	SafeDelete(m_pMesh3);
-	
+
 	//release the camera
 	SafeDelete(m_pCamera);
-	
+
 	//release GUI
 	ShutdownGUI();
 }

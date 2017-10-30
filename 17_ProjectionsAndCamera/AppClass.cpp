@@ -58,10 +58,22 @@ void Application::Display(void)
 	m_pCamera->SetTarget(vector3(fPos, 0.0f, 9.0f));
 	fPos -= 0.01f;
 
+	vector3 v3LookingAt = m_v3CameraPosition;
+	v3LookingAt -= 1.0f;
+	float fRatio = m_pSystem->GetWindowRatio();
+	
+	// glm::lookAt( where are you, what you're looking at, what is up in your world);
+	// glm::perspective(field of view, aspect ratio of monitor, near plane, far plane);
+	// glm::ortho(how much to the left you can see, how much to the right you can see, how much down, how much up, near , far)
+	//matrix4 m4Projection = glm::perspective(45.0f,fRatio, 0.01f, 1000.0f); //m_pCameraMngr->GetProjectionMatrix();
+	matrix4 m4Projection = glm::ortho(-10.0f, 10.f, -20.0f, 20.f, .01f, 1000.0f);
+	matrix4 m4View = glm::lookAt(vector3(0, 0, 30) + m_v3CameraPosition, vector3(0, 0, 0) + v3LookingAt, AXIS_Y);//m_pCameraMngr->GetViewMatrix();
+	matrix4 m4Model = ToMatrix4(m_qArcBall);
+
 	//draw the primitive
 	//m_pMesh->Render(m_pCamera->GetProjectionMatrix(), m_pCamera->GetViewMatrix(), ToMatrix4(m_qArcBall));
 	//m_pMesh->Render(m_pCamera, ToMatrix4(m_qArcBall));
-	m_pMesh2->Render(m_pCamera, glm::translate(vector3(0.0f, 0.0f, -5.0f)));
+	m_pMesh->Render(m4Projection,m4View,m4Model);
 
 	//render list call
 	m_uRenderCallCount = m_pMeshMngr->Render();

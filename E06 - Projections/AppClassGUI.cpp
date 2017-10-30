@@ -46,6 +46,8 @@ void Application::DrawGUI(void)
 			ImGui::Text("	  5: Camera 5\n");
 			ImGui::Text("	  6: Camera 6\n");
 			ImGui::Text("	  7: Camera 7\n");
+			ImGui::Text("	  8: Camera 8\n");
+			ImGui::Text("	  9: Camera 9\n");
 		}
 		ImGui::End();
 	}

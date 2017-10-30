@@ -16,6 +16,8 @@ namespace Simplex
 
 class Application
 {
+	vector3 m_v3CameraPosition = vector3(0, 0, 0);
+
 	Model* m_pModel = nullptr; //Model to display
 	matrix4 m_mModel; //Model to world matrix for Steve
 	

@@ -152,6 +152,12 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 	case sf::Keyboard::Num7:
 		m_uProjection = 7;
 		break;
+	case sf::Keyboard::Num8:
+		m_uProjection = 8;
+		break;
+	case sf::Keyboard::Num9:
+		m_uProjection = 9;
+		break;
 	}
 
 	//gui
