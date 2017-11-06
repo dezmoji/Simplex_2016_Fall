@@ -23,7 +23,14 @@ void Application::InitVariables(void)
 	m_pMyMeshMngr = MyMeshManager::GetInstance();
 	m_pMyMeshMngr->SetCamera(m_pCamera);
 	
+	m_pMesh = new MyMesh();
+	m_pMesh->GenerateCylinder(1.0f, 2.0f, 6, C_PURPLE);
 	
+	for (uint i = 0; i < 5000; ++i) {
+		matrix4* pMatrix = new matrix4();
+		*pMatrix = glm::translate(IDENTITY_M4, vector3(i *2.0f, 0, 0));
+		m_m4List.push_back(pMatrix);
+	}
 }
 void Application::Update(void)
 {
@@ -52,15 +59,22 @@ void Application::Display(void)
 {
 	//Clear the screen
 	ClearScreen();
+	/*
+	for (uint i = 0; i < 5000; ++i) {
+		m_pMesh->Render(m_pCamera, glm::translate(IDENTITY_M4, vector3(i *2.0f,0,0 )) * ToMatrix4(m_qArcBall));
+	}
+	*/
+
+	m_pMesh->Render(m_pCamera, m_m4List);
 
 	//Render the list of MyMeshManager
-	m_pMyMeshMngr->Render();
+	//m_pMyMeshMngr->Render();
 
 	//clear the MyMeshManager list
-	m_pMyMeshMngr->ClearRenderList();
+	//m_pMyMeshMngr->ClearRenderList();
 
 	//render list call
-	m_uRenderCallCount = m_pMeshMngr->Render();
+	//m_uRenderCallCount = m_pMeshMngr->Render();
 
 	//clear the render list
 	m_pMeshMngr->ClearRenderList();
@@ -73,6 +87,10 @@ void Application::Display(void)
 }
 void Application::Release(void)
 {
+	for (uint i = 0; i < 5000; ++i) {
+		SafeDelete(m_m4List[i]);
+	}
+
 	//release the singleton
 	MyMeshManager::ReleaseInstance();
 

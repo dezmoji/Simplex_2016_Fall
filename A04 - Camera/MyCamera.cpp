@@ -111,6 +111,11 @@ void Simplex::MyCamera::ResetCamera(void)
 	m_v3Target = vector3(0.0f, 0.0f, 0.0f); //What I'm looking at
 	m_v3Up = vector3(0.0f, 1.0f, 0.0f); //What is up
 
+	// calculate top, forward, and Right
+	m_v3Top = m_v3Position + m_v3Up;
+	m_v3Forward = glm::normalize(m_v3Target - m_v3Position);
+	m_v3Right = glm::normalize(glm::cross(m_v3Up, m_v3Forward));
+
 	m_bPerspective = true; //perspective view? False is Orthographic
 
 	m_fFOV = 45.0f; //Field of View
@@ -129,7 +134,13 @@ void Simplex::MyCamera::SetPositionTargetAndUp(vector3 a_v3Position, vector3 a_v
 {
 	m_v3Position = a_v3Position;
 	m_v3Target = a_v3Target;
-	m_v3Up = a_v3Position + a_v3Upward;
+	m_v3Up = glm::normalize(a_v3Upward); // normalize the up vector
+
+	// calculate the top, forward, and right vectors
+	m_v3Forward = glm::normalize(m_v3Target - m_v3Position);
+	m_v3Right = glm::normalize(glm::cross(m_v3Up, m_v3Forward));
+	m_v3Top = a_v3Position + m_v3Up;
+
 	CalculateProjectionMatrix();
 }
 
@@ -153,4 +164,47 @@ void Simplex::MyCamera::CalculateProjectionMatrix(void)
 										m_v2Vertical.x, m_v2Vertical.y, //vertical
 										m_v2NearFar.x, m_v2NearFar.y); //near and far
 	}
+}
+
+void Simplex::MyCamera::MoveForward(float a_fSpeed) {
+	vector3 v3Temp = m_v3Forward * a_fSpeed;
+
+	// add the forward vector to position, target, and top vectors
+	m_v3Position += v3Temp;
+	m_v3Target += v3Temp;
+	m_v3Top += v3Temp;
+
+	// calculate the new forward, up, and right vectors
+	m_v3Forward = glm::normalize(m_v3Target - m_v3Position);
+	m_v3Up = glm::normalize(m_v3Top - m_v3Position);
+	m_v3Right = glm::normalize(glm::cross(m_v3Up, m_v3Forward));
+}
+
+void Simplex::MyCamera::MoveSideways(float a_fSpeed) {
+	vector3 v3Temp = m_v3Right * a_fSpeed;
+
+	// add the Right vector to postion, target, and top vectors
+	m_v3Position += v3Temp;
+	m_v3Target += v3Temp;
+	m_v3Top += v3Temp;
+
+	// calculate the new forward, up, and right vectors
+	m_v3Forward = glm::normalize(m_v3Target - m_v3Position);
+	m_v3Up = glm::normalize(m_v3Top - m_v3Position);
+	m_v3Right = glm::normalize(glm::cross(m_v3Up, m_v3Forward));
+}
+
+void Simplex::MyCamera::RotateCamera(float a_fAngleX, float a_fAngleY)
+{
+	// calculate new quaternions for rotation
+	m_qAngleX = glm::angleAxis(glm::degrees(a_fAngleX), m_v3Right);
+	m_qAngleY = glm::angleAxis(glm::degrees(a_fAngleY), m_v3Up);
+
+	// calculate new forward vector
+	m_v3Forward = glm::rotate(glm::cross(m_qAngleX, m_qAngleY), glm::normalize(m_v3Target - m_v3Position));
+
+	// calculate new target, right and top vectors
+	m_v3Target = m_v3Position + m_v3Forward;
+	m_v3Right = glm::normalize(glm::cross(m_v3Up, m_v3Forward));
+	m_v3Top = m_v3Position + m_v3Up;
 }

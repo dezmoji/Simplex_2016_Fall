@@ -509,3 +509,88 @@ void Simplex::MyMesh::Render(MyCamera * a_pCamera, std::vector<matrix4> a_ToWorl
 		}
 	}
 }
+
+void Simplex::MyMesh::Render(MyCamera * a_pCamera, std::vector<matrix4*> a_ToWorldList)
+{
+	int nElements = a_ToWorldList.size();//count elements to render
+	if (nElements > 0)
+	{
+		//make an array to store the floats, each matrix has 16 of them
+		float* fTransformsArray = new float[16 * nElements];//reserve memory
+
+															//memcpy the translated values to the array (way faster than copy element by element)
+		for (int nElement = 0; nElement < nElements; ++nElement)
+		{
+			//const float* m4MVP = glm::value_ptr(a_ToWorldList[nElement]); //ask glm for the translated value
+			memcpy(&fTransformsArray[nElement * 16], glm::value_ptr(*a_ToWorldList[nElement]), 16 * sizeof(float)); //attach the value
+		}
+
+		//render
+
+		// Use the buffer and shader
+		GLuint nShader = m_pShaderMngr->GetShaderID("Basic-Instanced");
+		glUseProgram(nShader);
+
+		//Bind the VAO of this object
+		glBindVertexArray(m_VAO);
+
+		// Get the GPU variables by their name and hook them to CPU variables
+		GLuint VP = glGetUniformLocation(nShader, "VP");
+		GLuint m4ToWorld = glGetUniformLocation(nShader, "m4ToWorld");
+		GLuint wire = glGetUniformLocation(nShader, "wire");
+
+		//Final Projection of the Camera
+		matrix4 m4VP = a_pCamera->GetProjectionMatrix() * a_pCamera->GetViewMatrix();
+		glUniformMatrix4fv(VP, 1, GL_FALSE, glm::value_ptr(m4VP));
+
+		//Number of Instances
+		uint nSections = nElements / 250;
+		uint nRemainders = nElements - (250 * nSections);
+		uint nInstances = nElements;
+		for (uint n = 0; n < nSections; n++)
+		{
+			//Draw section
+			glUniformMatrix4fv(m4ToWorld, 250, GL_FALSE, &fTransformsArray[n * 250 * 16]);
+
+			//Solid
+			glUniform3f(wire, -1.0f, -1.0f, -1.0f);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glDrawArraysInstanced(GL_TRIANGLES, 0, m_uVertexCount, 250);
+
+			//Wire
+			glUniform3f(wire, 1.0f, 0.0f, 1.0f);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			glEnable(GL_POLYGON_OFFSET_LINE);
+			glPolygonOffset(-1.f, -1.f);
+			glDrawArraysInstanced(GL_TRIANGLES, 0, m_uVertexCount, 250);
+			glDisable(GL_POLYGON_OFFSET_LINE);
+		}
+
+		//Draw reminders
+		glUniformMatrix4fv(m4ToWorld, nRemainders, GL_FALSE, &fTransformsArray[nSections * 250 * 16]);
+
+		//Solid
+		glUniform3f(wire, -1.0f, -1.0f, -1.0f);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawArraysInstanced(GL_TRIANGLES, 0, m_uVertexCount, nRemainders);
+
+		//Wire
+		glUniform3f(wire, 1.0f, 0.0f, 1.0f);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glEnable(GL_POLYGON_OFFSET_LINE);
+		glPolygonOffset(-1.f, -1.f);
+		glDrawArraysInstanced(GL_TRIANGLES, 0, m_uVertexCount, nRemainders);
+		glDisable(GL_POLYGON_OFFSET_LINE);
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //Set rendering mode back to fill
+
+		glBindVertexArray(0);//set the default VAO back
+
+							 //deallocate memory
+		if (fTransformsArray)
+		{
+			delete[] fTransformsArray;
+			fTransformsArray = nullptr;
+		}
+	}
+}

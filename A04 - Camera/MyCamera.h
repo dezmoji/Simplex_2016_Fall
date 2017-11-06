@@ -14,7 +14,13 @@ class MyCamera
 {
 	vector3 m_v3Position = vector3(0.0f, 0.0f, 10.0f); //Where my camera is located
 	vector3 m_v3Target = vector3(0.0f, 0.0f, 0.0f); //What I'm looking at
-	vector3 m_v3Up = vector3(0.0f, 1.0f, 0.0f); //What is up
+	vector3 m_v3Up = vector3(0, 1.0f, 0); //What is up
+
+	vector3 m_v3Top = m_v3Position + m_v3Up; // top of the camera
+	vector3 m_v3Forward = glm::normalize(m_v3Target - m_v3Position); // forward vector of the camera
+	vector3 m_v3Right = glm::normalize(glm::cross(m_v3Up, m_v3Forward)); // rightward vector of the camera
+
+	quaternion m_qAngleX, m_qAngleY; // quaternions for vertical and horizontal rotations
 
 	bool m_bPerspective = true; //perspective view? False is Orthographic
 
@@ -211,6 +217,29 @@ public:
 	OUTPUT: ---
 	*/
 	void CalculateProjectionMatrix(void);
+
+	/*
+	USAGE: Moves the camera using the forward vector
+	ARGUMENTS: float a_fSpeed -> speed of movement
+	OUTPUT: ---
+	*/
+	void MoveForward(float a_fSpeed);
+
+	/*
+	USAGE: Moves the camera using the right vector
+	ARGUMENTS: float a_fSpeed -> speed of movement
+	OUTPUT: ---
+	*/
+	void MoveSideways(float a_fSpeed);
+
+	/*
+	USAGE: Rotates the view of the camera
+	ARGUMENTS:
+	-	float a_fAngleX -> angle of rotation for X axis
+	-	float a_fAngleY -> angle of rotation for Y axis
+	OUTPUT: ---
+	*/
+	void RotateCamera(float a_fAngleX, float a_fAngleY);
 };
 
 } //namespace Simplex
