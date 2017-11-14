@@ -286,6 +286,15 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	Simplex that might help you [eSATResults] feel free to use it.
 	(eSATResults::SAT_NONE has a value of 0)
 	*/
+	
+	float ra, rb;
+	matrix3 R, AbsR;
+
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			R[i][j] = glm::dot( , a_pOther->)
+		}
+	}
 
 	//there is no axis test that separates this two objects
 	return eSATResults::SAT_NONE;
