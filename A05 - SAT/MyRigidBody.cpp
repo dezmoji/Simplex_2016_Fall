@@ -275,26 +275,76 @@ void MyRigidBody::AddToRenderList(void)
 }
 
 uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
-{
-	/*
-	Your code goes here instead of this comment;
+{	
+	float radiusA, radiusB;
+	matrix4 rotation, absRotation;
 
-	For this method, if there is an axis that separates the two objects
-	then the return will be different than 0; 1 for any separating axis
-	is ok if you are not going for the extra credit, if you could not
-	find a separating axis you need to return 0, there is an enum in
-	Simplex that might help you [eSATResults] feel free to use it.
-	(eSATResults::SAT_NONE has a value of 0)
-	*/
-	
-	float ra, rb;
-	matrix3 R, AbsR;
-
+	// find the rotation matrix expressing the other rigidbody in this one's coordinate frame
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
-			R[i][j] = glm::dot( , a_pOther->)
+			rotation[i][j] = glm::dot(m_m4ToWorld[i], a_pOther->m_m4ToWorld[j]);
 		}
 	}
+
+	// find the translation vector and then bring it into this rigidbodies coordinate frame
+	vector4 translation = (a_pOther->m_m4ToWorld * vector4(a_pOther->m_v3Center, 1.0f)) - (m_m4ToWorld * vector4(m_v3Center, 1.0f));
+	translation = vector4(glm::dot(translation, m_m4ToWorld[0]), glm::dot(translation, m_m4ToWorld[1]), glm::dot(translation, m_m4ToWorld[2]), glm::dot(translation, m_m4ToWorld[3]));
+
+	// find the absolute rotation matrix (epsilon is added to counter math erros when two edges are parallel and their cross product is near null
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			absRotation[i][j] = glm::abs(rotation[i][j]) + glm::epsilon<float>();
+		}
+	}
+
+	// test the different axes
+	for (int i = 0; i < 3; i++) {
+		radiusA = m_v3HalfWidth[i];
+		radiusB = a_pOther->m_v3HalfWidth[0] * absRotation[i][0] + a_pOther->m_v3HalfWidth[1] * absRotation[i][1] + a_pOther->m_v3HalfWidth[2] * absRotation[i][2];
+		if (glm::abs(translation[i]) > radiusA + radiusB) return 1;
+	}
+
+	for (int i = 0; i < 3; i++) {
+		radiusA = m_v3HalfWidth[0] * absRotation[0][i] + m_v3HalfWidth[1] * absRotation[1][i] + m_v3HalfWidth[2] + absRotation[2][i];
+		radiusB = a_pOther->m_v3HalfWidth[i];
+		if (glm::abs(translation[0] * rotation[0][i] + translation[1] * rotation[1][i] + translation[2] * rotation[2][i]) > radiusA + radiusB) return 1;
+	}
+
+	radiusA = m_v3HalfWidth[1] * absRotation[2][0] + m_v3HalfWidth[2] * absRotation[1][0];
+	radiusB = a_pOther->m_v3HalfWidth[1] * absRotation[0][2] + a_pOther->m_v3HalfWidth[2] * absRotation[0][1];
+	if (glm::abs(translation[2] * rotation[1][0] - translation[1] * rotation[2][0]) > radiusA + radiusB) return 1;
+
+	radiusA = m_v3HalfWidth[1] * absRotation[2][1] + m_v3HalfWidth[2] * absRotation[1][1];
+	radiusB = a_pOther->m_v3HalfWidth[0] * absRotation[0][2] + a_pOther->m_v3HalfWidth[2] * absRotation[0][0];
+	if (glm::abs(translation[2] * rotation[1][1] - translation[1] * rotation[2][1]) > radiusA + radiusB) return 1;
+
+	radiusA = m_v3HalfWidth[1] * absRotation[2][2] + m_v3HalfWidth[2] * absRotation[1][2];
+	radiusB = a_pOther->m_v3HalfWidth[0] * absRotation[0][1] + a_pOther->m_v3HalfWidth[1] * absRotation[0][0];
+	if (glm::abs(translation[2] * rotation[1][2] - translation[1] * rotation[2][2]) > radiusA + radiusB) return 1;
+
+	radiusA = m_v3HalfWidth[0] * absRotation[2][0] + m_v3HalfWidth[2] * absRotation[0][0];
+	radiusB = a_pOther->m_v3HalfWidth[1] * absRotation[1][2] + a_pOther->m_v3HalfWidth[2] * absRotation[1][1];
+	if (glm::abs(translation[0] * rotation[2][0] - translation[2] * rotation[0][0]) > radiusA + radiusB) return 1;
+
+	radiusA = m_v3HalfWidth[0] * absRotation[2][1] + m_v3HalfWidth[2] * absRotation[0][1];
+	radiusB = a_pOther->m_v3HalfWidth[0] * absRotation[1][2] + a_pOther->m_v3HalfWidth[2] * absRotation[1][0];
+	if (glm::abs(translation[0] * rotation[2][1] - translation[2] * rotation[0][1]) > radiusA + radiusB) return 1;
+
+	radiusA = m_v3HalfWidth[0] * absRotation[2][2] + m_v3HalfWidth[2] * absRotation[0][2];
+	radiusB = a_pOther->m_v3HalfWidth[0] * absRotation[1][1] + a_pOther->m_v3HalfWidth[1] * absRotation[1][0];
+	if (glm::abs(translation[0] * rotation[2][2] - translation[2] * rotation[0][2]) > radiusA + radiusB) return 1;
+
+	radiusA = m_v3HalfWidth[0] * absRotation[1][0] + m_v3HalfWidth[1] * absRotation[0][0];
+	radiusB = a_pOther->m_v3HalfWidth[1] * absRotation[2][2] + a_pOther->m_v3HalfWidth[2] * absRotation[2][1];
+	if (glm::abs(translation[1] * rotation[0][0] - translation[0] * rotation[1][0]) > radiusA + radiusB) return 1;
+
+	radiusA = m_v3HalfWidth[0] * absRotation[1][1] + m_v3HalfWidth[1] * absRotation[0][1];
+	radiusB = a_pOther->m_v3HalfWidth[0] * absRotation[2][2] + a_pOther->m_v3HalfWidth[2] * absRotation[2][0];
+	if (glm::abs(translation[1] * rotation[0][1] - translation[0] * rotation[1][1]) > radiusA + radiusB) return 1;
+
+	radiusA = m_v3HalfWidth[0] * absRotation[1][2] + m_v3HalfWidth[1] * absRotation[0][2];
+	radiusB = a_pOther->m_v3HalfWidth[0] * absRotation[2][1] + a_pOther->m_v3HalfWidth[1] * absRotation[2][0];
+	if (glm::abs(translation[1] * rotation[0][2] - translation[0] * rotation[1][2]) > radiusA + radiusB) return 1;
 
 	//there is no axis test that separates this two objects
 	return eSATResults::SAT_NONE;
